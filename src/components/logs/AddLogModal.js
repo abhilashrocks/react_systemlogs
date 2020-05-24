@@ -1,7 +1,11 @@
 import React, { useState } from 'react';
 import M from 'materialize-css/dist/js/materialize.min.js';
+import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
+import { addLog } from '../../actions/logActions';
+import TechSelectOptions from '../techs/TechSelectOptions';
 
-const AddLogModal = () => {
+const AddLogModal = ({ addLog }) => {
     const [message, setMessage] = useState('');
     const [attention, setAttention] = useState(false);
     const [tech, setTech] = useState('');
@@ -9,6 +13,9 @@ const AddLogModal = () => {
         if (message === '' || tech === '') {
             M.toast({ html: 'Please enter a message and tech' });
         } else {
+            const newLog = { message, attention, tech, date: new Date() }
+            addLog(newLog);
+            M.toast({ html: `Log added by ${tech}` })
             setMessage('');
             setTech('');
             setAttention(false);
@@ -29,7 +36,7 @@ const AddLogModal = () => {
                         <select name="tech" value={tech} className="browser-default"
                             onChange={e => setTech(e.target.value)}>
                             <option value='' disabled>Select Technician</option>
-                            <option value='Abhilash'>Abhilash</option>
+                            <TechSelectOptions />
                         </select>
                     </div>
                 </div>
@@ -38,7 +45,7 @@ const AddLogModal = () => {
                         <p>
                             <label>
                                 <input type="checkbox"
-                                    onChange={e => setAttention(e.target.values)}
+                                    onChange={e => setAttention(!attention)}
                                     className="filled-in"
                                     checked={attention} value={attention} />
                                 <span>Need Attention</span>
@@ -58,4 +65,7 @@ const modalStyle = {
     width: '75%',
     height: '75%'
 };
-export default AddLogModal
+AddLogModal.propTypes = {
+    addLog: PropTypes.func.isRequired,
+}
+export default connect(null, { addLog })(AddLogModal)
